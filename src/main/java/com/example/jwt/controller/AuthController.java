@@ -9,7 +9,9 @@ import com.example.jwt.service.dto.AuthResponseDTO;
 import com.example.jwt.service.dto.AuthUserSubject;
 import com.example.jwt.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,9 +35,14 @@ public class AuthController {
     @Autowired
     private JWTUtil jwtUtil;
 
-    @GetMapping("/test")
+    @GetMapping("/admin")
     public String test() {
-        return "test";
+        return "admin";
+    }
+
+    @GetMapping("/client")
+    public String client() {
+        return "client";
     }
 
     @PostMapping("/authenticate")
@@ -45,7 +52,7 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword())
             );
         } catch (BadCredentialsException ex) {
-            throw new Exception("Incorrect username or password", ex);
+            return new ResponseEntity<String>("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
 
         final User user = userService.loadUserByUsername(dto.getUsername());

@@ -1,10 +1,10 @@
 package com.example.jwt.repository;
 
 import com.example.jwt.domain.UserRole;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
-    Optional<UserRole> findByRoleName(String roleName);
+public interface UserRoleRepository extends CrudRepository<UserRole, Long> {
+    Optional<UserRole> findDistinctByRoleName(String roleName);
 }

@@ -29,6 +29,6 @@ public class UserAdapterService {
 
     public AuthUserSubject fromUserToAuthSubject(User user) {
         List<String> roles = user.getRoles().stream().map(role -> role.getRoleName()).collect(Collectors.toList());
-        return new AuthUserSubject(user.getUsername(), user.getPassword(), roles);
+        return new AuthUserSubject(user.getUsername(), roles);
     }
 }

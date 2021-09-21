@@ -12,4 +12,6 @@ import java.util.List;
 public class AuthUserSubject {
     private String username;
     private List<String> roles;
+    private String uuid;
+    private Boolean isActive;
 }

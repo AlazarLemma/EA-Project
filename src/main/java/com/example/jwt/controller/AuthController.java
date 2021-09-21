@@ -1,12 +1,14 @@
 package com.example.jwt.controller;
 
 import com.example.jwt.domain.User;
+import com.example.jwt.domain.UserRole;
 import com.example.jwt.service.AuthUserDetailService;
 import com.example.jwt.service.UserAdapterService;
 import com.example.jwt.service.UserService;
 import com.example.jwt.service.dto.AuthRequestDTO;
 import com.example.jwt.service.dto.AuthResponseDTO;
 import com.example.jwt.service.dto.AuthUserSubject;
+import com.example.jwt.service.dto.UserDto;
 import com.example.jwt.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class AuthController {
     @Autowired
@@ -34,16 +38,6 @@ public class AuthController {
 
     @Autowired
     private JWTUtil jwtUtil;
-
-    @GetMapping("/admin")
-    public String test() {
-        return "admin";
-    }
-
-    @GetMapping("/client")
-    public String client() {
-        return "client";
-    }
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequestDTO dto) throws Exception {
@@ -60,5 +54,23 @@ public class AuthController {
         String jwt = jwtUtil.generateToken(subject);
 
         return ResponseEntity.ok(new AuthResponseDTO(jwt));
+    }
+
+    @GetMapping("/roles")
+    public ResponseEntity<?> getRoles() {
+        List<UserRole> roles = userService.getRoles();
+        return ResponseEntity.ok(roles);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody UserDto dto) throws Exception {
+        User user = userService.loadUserByUsername(dto.getUsername());
+
+        if (user != null) {
+            return new ResponseEntity<String>("user already exists", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        UserDto result = userService.registerUser(dto);
+        return ResponseEntity.ok(result);
     }
 }

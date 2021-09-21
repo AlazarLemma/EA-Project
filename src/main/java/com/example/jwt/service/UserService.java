@@ -1,21 +1,69 @@
 package com.example.jwt.service;
 
+import antlr.BaseAST;
 import com.example.jwt.domain.User;
+import com.example.jwt.domain.UserRole;
 import com.example.jwt.repository.UserRepository;
+import com.example.jwt.repository.UserRoleRepository;
+import com.example.jwt.service.dto.UserDto;
+import com.fasterxml.uuid.Generators;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
     @Autowired
     private UserRepository repository;
 
+    @Autowired
+    private UserRoleRepository roleRepository;
+
+    @Autowired
+    private UserAdapterService adapterService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public User loadUserByUsername(String username) {
         Optional<User> user = repository.findByUsername(username);
-        user.orElseThrow(() -> new UsernameNotFoundException("username not found for " + username));
-        return user.get();
+        return user.orElse(null);
+    }
+
+    public UserDto registerUser(UserDto dto) {
+        UUID uuid = Generators.timeBasedGenerator().generate();
+        dto.setUuid(uuid.toString());
+        dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+
+        User user = adapterService.fromDto(dto);
+
+        List<Long> roleIds = dto.getRoleIds();
+        List<UserRole> roles = this.findManyRoles(roleIds);
+        user.setRoles(roles);
+
+
+        System.out.println(roles);
+
+        System.out.println(user);
+
+        try {
+            user = repository.save(user);
+        } catch(Exception ex) {}
+
+        return adapterService.fromUserToDto(user);
+    }
+
+    public List<UserRole> getRoles() {
+        return (List<UserRole>) roleRepository.findAll();
+    }
+
+    public List<UserRole> findManyRoles(List<Long> roleIds) {
+        return roleRepository.findMany(roleIds);
     }
 }

@@ -22,7 +22,10 @@ public class User {
     @NonNull
     private String password;
     @NonNull
+    @Getter
     private boolean active;
+    @NonNull
+    private String uuid;
 
     @OneToMany
     @JoinTable(

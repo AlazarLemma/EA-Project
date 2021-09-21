@@ -9,6 +9,7 @@ import com.example.jwt.service.dto.AuthRequestDTO;
 import com.example.jwt.service.dto.AuthResponseDTO;
 import com.example.jwt.service.dto.AuthUserSubject;
 import com.example.jwt.service.dto.UserDto;
+import com.example.jwt.service.util.CustomLoggerService;
 import com.example.jwt.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,9 @@ public class AuthController {
     @Autowired
     private JWTUtil jwtUtil;
 
+    @Autowired
+    private CustomLoggerService loggerService;
+
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequestDTO dto) throws Exception {
         try {
@@ -46,12 +50,15 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword())
             );
         } catch (BadCredentialsException ex) {
+            loggerService.log("invalid credentials " + dto);
             return new ResponseEntity<String>("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
 
         final User user = userService.loadUserByUsername(dto.getUsername());
         final AuthUserSubject subject = userAdapterService.fromUserToAuthSubject(user);
         String jwt = jwtUtil.generateToken(subject);
+
+        loggerService.log("user authenticated " + jwt);
 
         return ResponseEntity.ok(new AuthResponseDTO(jwt));
     }
@@ -71,6 +78,9 @@ public class AuthController {
         }
 
         UserDto result = userService.registerUser(dto);
+
+        loggerService.log("user registered successfully" + result);
+
         return ResponseEntity.ok(result);
     }
 }

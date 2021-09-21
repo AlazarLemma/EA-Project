@@ -19,6 +19,6 @@ public class KafkaSender {
     }
 
     public void logToKafka(String message) {
-        kafkaTemplate.send("appointment-log", message);
+        kafkaTemplate.send("appointment-system-log", message);
     }
 }

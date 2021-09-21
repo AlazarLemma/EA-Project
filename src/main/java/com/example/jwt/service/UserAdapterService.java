@@ -1,6 +1,7 @@
 package com.example.jwt.service;
 
 import com.example.jwt.domain.User;
+import com.example.jwt.domain.UserRegisteredEvent;
 import com.example.jwt.domain.UserRole;
 import com.example.jwt.service.dto.AuthUserDetails;
 import com.example.jwt.service.dto.AuthUserSubject;
@@ -39,5 +40,10 @@ public class UserAdapterService {
 
     public UserDto fromUserToDto(User user) {
         return new UserDto(user.getId(), user.getUsername(), user.getPassword(), user.getUuid(), user.isActive(), null);
+    }
+
+    public UserRegisteredEvent getUserRegisteredEvent(User user) {
+        List<String> roles = user.getRoles().stream().map(role -> role.getRoleName()).collect(Collectors.toList());
+        return new UserRegisteredEvent(user.getUsername(), user.getUuid(), user.isActive(), roles);
     }
 }

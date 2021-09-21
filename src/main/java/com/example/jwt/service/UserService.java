@@ -2,7 +2,9 @@ package com.example.jwt.service;
 
 import antlr.BaseAST;
 import com.example.jwt.domain.User;
+import com.example.jwt.domain.UserRegisteredEvent;
 import com.example.jwt.domain.UserRole;
+import com.example.jwt.integration.KafkaSender;
 import com.example.jwt.repository.UserRepository;
 import com.example.jwt.repository.UserRoleRepository;
 import com.example.jwt.service.dto.UserDto;
@@ -31,6 +33,9 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private KafkaSender sender;
+
     public User loadUserByUsername(String username) {
         Optional<User> user = repository.findByUsername(username);
         return user.orElse(null);
@@ -53,8 +58,12 @@ public class UserService {
         System.out.println(user);
 
         try {
-            user = repository.save(user);
+            repository.save(user);
         } catch(Exception ex) {}
+
+        // publish user registered event to topic "user"
+        UserRegisteredEvent event = adapterService.getUserRegisteredEvent(user);
+        sender.sendUserRegistered("user-registered", event);
 
         return adapterService.fromUserToDto(user);
     }

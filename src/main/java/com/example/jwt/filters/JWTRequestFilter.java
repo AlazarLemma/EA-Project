@@ -47,8 +47,6 @@ public class JWTRequestFilter extends OncePerRequestFilter {
             } catch (Exception ex) {
                 loggerService.log("Cannot decrypt token " + jwt + " Exception : " +  ex.toString());
             }
-            username = jwtUtil.extractUsername(jwt);
-
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

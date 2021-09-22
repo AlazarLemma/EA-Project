@@ -52,7 +52,7 @@ public class UserService {
         List<UserRole> roles = this.findManyRoles(roleIds);
         user.setRoles(roles);
 
-        System.out.println(user);
+        repository.save(user);
 
         // publish user registered event to topic "user"
         UserRegisteredEvent event = adapterService.getUserRegisteredEvent(user);

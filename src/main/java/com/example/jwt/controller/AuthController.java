@@ -10,6 +10,7 @@ import com.example.jwt.service.dto.AuthResponseDTO;
 import com.example.jwt.service.dto.AuthUserSubject;
 import com.example.jwt.service.dto.UserDto;
 import com.example.jwt.service.util.CustomLoggerService;
+import com.example.jwt.util.EncryptionUtil;
 import com.example.jwt.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -41,6 +43,9 @@ public class AuthController {
     @Autowired
     private CustomLoggerService loggerService;
 
+    @Autowired
+    private EncryptionUtil encryptionUtil;
+
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequestDTO dto) throws Exception {
         try {
@@ -56,9 +61,11 @@ public class AuthController {
         final AuthUserSubject subject = userAdapterService.fromUserToAuthSubject(user);
         String jwt = jwtUtil.generateToken(subject);
 
-        loggerService.log("user authenticated " + jwt);
+        String encryptedJwt = Base64.getEncoder().encodeToString(encryptionUtil.encrypt(jwt));
 
-        return ResponseEntity.ok(new AuthResponseDTO(jwt));
+        loggerService.log("user authenticated: encrypted jwt " + encryptedJwt);
+
+        return ResponseEntity.ok(new AuthResponseDTO(encryptedJwt));
     }
 
     @GetMapping("/roles")

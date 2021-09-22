@@ -31,6 +31,18 @@ public class UserSeedService implements CommandLineRunner {
     @Value("${ADMIN_PASSWORD}")
     private String password;
 
+    @Value("${CLIENT_USERNAME}")
+    private String clientUsername;
+
+    @Value("${CLIENT_PASSWORD}")
+    private String clientPassword;
+
+    @Value("${PROVIDER_USERNAME}")
+    private String providerUsername;
+
+    @Value("${PROVIDER_PASSWORD}")
+    private String providerPassword;
+
     @Override
     public void run(String... args) throws Exception {
         seedAdminUser();
@@ -53,11 +65,17 @@ public class UserSeedService implements CommandLineRunner {
             admin.setRoles(adminRoles);
             repository.save(admin);
 
-            // seed admin user with roles ['admin']
+            // seed client user with roles ['client']
             List<UserRole> clientRoles = Arrays.asList(roleRepository.findDistinctByRoleName("client").get());
-            User client = new User("client", passwordEncoder.encode("client"), true, Generators.timeBasedGenerator().generate().toString());
+            User client = new User(clientUsername, passwordEncoder.encode(clientPassword), true, Generators.timeBasedGenerator().generate().toString());
             client.setRoles(clientRoles);
             repository.save(client);
+
+            // seed provider user with roles ['provider']
+            List<UserRole> providerRoles = Arrays.asList(roleRepository.findDistinctByRoleName("provider").get());
+            User provider = new User(providerUsername, passwordEncoder.encode(providerPassword), true, Generators.timeBasedGenerator().generate().toString());
+            provider.setRoles(providerRoles);
+            repository.save(provider);
         } catch(Exception e){}
     }
 }

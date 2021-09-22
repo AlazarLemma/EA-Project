@@ -27,11 +27,11 @@ public class User {
     @NonNull
     private String uuid;
 
-    @OneToMany
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
-        joinColumns = {@JoinColumn(name="userId")},
-        inverseJoinColumns = {@JoinColumn(name="roleId")}
+        joinColumns = {@JoinColumn(name="user_id")},
+        inverseJoinColumns = {@JoinColumn(name="role_id")}
     )
     @Fetch(FetchMode.JOIN)
     private Collection<UserRole> roles;

@@ -56,26 +56,30 @@ public class UserSeedService implements CommandLineRunner {
 
             // seed all roles
             roleRepository.saveAll(Arrays.asList(adminRole, providerRole, clientRole));
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         try{
             // seed admin user with roles ['admin']
-            List<UserRole> adminRoles = Arrays.asList(roleRepository.findDistinctByRoleName("admin").get());
+            List<UserRole> adminRoles = Arrays.asList(roleRepository.findDistinctByRoleName("ADMIN").get());
             User admin = new User(username, passwordEncoder.encode(password), true, Generators.timeBasedGenerator().generate().toString());
             admin.setRoles(adminRoles);
             repository.save(admin);
 
             // seed client user with roles ['client']
-            List<UserRole> clientRoles = Arrays.asList(roleRepository.findDistinctByRoleName("client").get());
+            List<UserRole> clientRoles = Arrays.asList(roleRepository.findDistinctByRoleName("CLIENT").get());
             User client = new User(clientUsername, passwordEncoder.encode(clientPassword), true, Generators.timeBasedGenerator().generate().toString());
             client.setRoles(clientRoles);
             repository.save(client);
 
             // seed provider user with roles ['provider']
-            List<UserRole> providerRoles = Arrays.asList(roleRepository.findDistinctByRoleName("provider").get());
+            List<UserRole> providerRoles = Arrays.asList(roleRepository.findDistinctByRoleName("PROVIDER").get());
             User provider = new User(providerUsername, passwordEncoder.encode(providerPassword), true, Generators.timeBasedGenerator().generate().toString());
             provider.setRoles(providerRoles);
             repository.save(provider);
-        } catch(Exception e){}
+        } catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }

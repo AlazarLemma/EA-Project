@@ -39,7 +39,8 @@ public class UserAdapterService {
     }
 
     public UserDto fromUserToDto(User user) {
-        return new UserDto(user.getId(), user.getUsername(), user.getPassword(), user.getUuid(), user.isActive(), null);
+        List<Long> roleIds = user.getRoles().stream().map(role -> role.getId()).collect(Collectors.toList());
+        return new UserDto(user.getId(), user.getUsername(), user.getPassword(), user.getUuid(), user.isActive(), roleIds);
     }
 
     public UserRegisteredEvent getUserRegisteredEvent(User user) {

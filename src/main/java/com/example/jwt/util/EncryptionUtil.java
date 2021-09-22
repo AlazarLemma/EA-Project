@@ -63,19 +63,19 @@ public class EncryptionUtil {
 
     public byte[] encrypt(String data) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, IOException {
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        String key = readFromFile(this.publicKeyPath);
-        cipher.init(Cipher.ENCRYPT_MODE, getPublicKey(key));
+        String key = readFromFile(this.privateKeyPath);
+        cipher.init(Cipher.ENCRYPT_MODE, getPrivateKey(key));
         return cipher.doFinal(data.getBytes());
     }
 
-    private static String decrypt(byte[] data, PrivateKey privateKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+    private static String decrypt(byte[] data, PublicKey publicKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        cipher.init(Cipher.DECRYPT_MODE, publicKey);
         return new String(cipher.doFinal(data));
     }
 
     public String decrypt(String data) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, IOException {
-        String base64PrivateKey = readFromFile(this.privateKeyPath);
-        return decrypt(Base64.getDecoder().decode(data.getBytes()), getPrivateKey(base64PrivateKey));
+        String base64PrivateKey = readFromFile(this.publicKeyPath);
+        return decrypt(Base64.getDecoder().decode(data.getBytes()), getPublicKey(base64PrivateKey));
     }
 }
